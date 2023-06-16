@@ -5,7 +5,15 @@ const app = express();
 const port = process.env.PORT || 3010;
 
 const mysql = require('mysql2');
-const connection = mysql.createConnection(process.env.DATABASE_URL);
+
+const connection = mysql.createConnection({
+  host: '54.227.27.235',
+  port: '3306',
+  user: 'oscar',
+  password: 'oscar',
+  database: 'biblioteca',
+});
+/* const connection = mysql.createConnection(process.env.DATABASE_URL); */
 
 const bodyParser = require('body-parser');
 const multer = require('multer');
@@ -23,7 +31,7 @@ connection.connect();
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-  connection.query('SELECT * FROM libros', (error, results, fields) => {
+  connection.query('SELECT * FROM biblioteca', (error, results, fields) => {
     if (error) throw error;
     res.render('index', { data: results });
   });
@@ -31,7 +39,7 @@ app.get('/', (req, res) => {
 
 app.get('/delete/:id', (req, res) => {
   const id = req.params.id;
-  connection.query('DELETE FROM libros WHERE id = ?', [id], (error, results) => {
+  connection.query('DELETE FROM biblioteca WHERE id = ?', [id], (error, results) => {
     if (error) throw error;
     res.redirect('/');
   });
@@ -74,7 +82,7 @@ app.post('/save', (req, res) => {
         console.log(params);
 
         connection.query(
-          'INSERT INTO libros SET ?',
+          'INSERT INTO biblioteca SET ?',
           { nombre: nombre, autor: autor, precio: precio, imagen: imagenURL },
           (error, results) => {
             if (error) {
@@ -92,7 +100,7 @@ app.post('/save', (req, res) => {
 
 app.get('/up/:id', (req, res) => {
   const id = req.params.id;
-  connection.query('SELECT * FROM libros WHERE id = ?', [id], (error, results, fields) => {
+  connection.query('SELECT * FROM biblioteca WHERE id = ?', [id], (error, results, fields) => {
     if (error) throw error;
     res.render('Editar.ejs', { data: results[0] });
   });
@@ -106,7 +114,7 @@ app.post('/update/:id', (req, res) => {
   const imagen = req.body.imagen;
 
   connection.query(
-    'UPDATE libros SET nombre = ?, autor = ?, precio = ?, imagen = ? WHERE id = ?',
+    'UPDATE biblioteca SET nombre = ?, autor = ?, precio = ?, imagen = ? WHERE id = ?',
     [nombre, autor, precio, imagen, id],
     (error, results) => {
       if (error) throw error;
